@@ -31,11 +31,11 @@ def object_to_hash(o)
   h = o.instance_variables.each_with_object({}) {|var, hash| hash[var.to_s.delete("@")] = o.instance_variable_get(var)}
 
   # In the hash, resolve lists and add the converted DocBook representation of blocks
-  if o.class == Asciidoctor::ListItem
+  if o.is_a? Asciidoctor::ListItem
       h["list_item_content"] = o.blocks.map {|b| object_to_hash(b)}
-  elsif o.class == Asciidoctor::List
+  elsif o.is_a? Asciidoctor::List
       h["list_content"] = o.items.map {|li| object_to_hash(li)}
-  elsif o.class == Array
+  elsif o.is_a? Array
       h["array_content"] = o.map {|ai| object_to_hash(ai)}
   else
       h["docbook"] = o.convert
