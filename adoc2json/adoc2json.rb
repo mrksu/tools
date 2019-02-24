@@ -8,8 +8,15 @@ require 'json'
 def object_to_hash(o)
   h = o.instance_variables.each_with_object({}) {|var, hash| hash[var.to_s.delete("@")] = o.instance_variable_get(var)}
 
-  # In the hash, add the converted DocBook representation of the object
-  h["docbook"] = o.convert
+  # In the hash, resolve lists and add the converted DocBook representation of blocks
+  if o.class == Asciidoctor::ListItem
+      h["list_item_content"] = o.blocks.map {|b| object_to_hash(b)}
+  elsif o.class == Asciidoctor::List
+      h["list_content"] = o.items.map {|li| object_to_hash(li)}
+  else
+      h["docbook"] = o.convert
+  end
+
   return h
 end
 
