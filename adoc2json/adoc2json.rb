@@ -35,6 +35,8 @@ def object_to_hash(o)
       h["list_item_content"] = o.blocks.map {|b| object_to_hash(b)}
   elsif o.class == Asciidoctor::List
       h["list_content"] = o.items.map {|li| object_to_hash(li)}
+  elsif o.class == Array
+      h["array_content"] = o.map {|ai| object_to_hash(ai)}
   else
       h["docbook"] = o.convert
       # Add a field with deconstructed DocBook
