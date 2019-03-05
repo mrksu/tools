@@ -2,28 +2,6 @@
 
 require 'asciidoctor'
 require 'json'
-require 'nokogiri'
-
-# Experimental XML analyzer
-class Nokogiri::XML::Node
-  def to_h(*a)
-    {"$name"=>name}.tap do |h|
-      kids = children.to_a
-      h.merge!(attributes)
-      h.merge!("$text"=>text) unless text.empty?
-      h.merge!("$kids"=>kids) unless kids.empty?
-    end.to_h(*a)
-  end
-end
-class Nokogiri::XML::Document
-  def to_h(*a); root.to_h(*a); end
-end
-class Nokogiri::XML::Text
-  def to_h(*a); text.to_h(*a); end
-end
-class Nokogiri::XML::Attr
-  def to_h(*a); value.to_h(*a); end
-end
 
 # Convert all instance variables of an object to a hash;
 # useful for the later conversion to JSON
@@ -39,8 +17,6 @@ def object_to_hash(o)
       h["array_content"] = o.map {|ai| object_to_hash(ai)}
   else
       h["docbook"] = o.convert
-      # Add a field with deconstructed DocBook
-      h["docbook_analyzed"] = Nokogiri::XML(o.convert).to_h
   end
 
   return h
